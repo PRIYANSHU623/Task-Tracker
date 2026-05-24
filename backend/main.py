@@ -15,6 +15,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+allow_origins=[
+    "https://task-tracker-umber-seven.vercel.app/"
+]
+
 
 
 class TaskCreate(BaseModel):
