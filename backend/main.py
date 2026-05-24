@@ -25,48 +25,76 @@ class TaskCreate(BaseModel):
 
 @app.post("/tasks")
 def create_task(task: TaskCreate):
-    
-    db=SessionLocal()
-    
-    new_task = models.Task(title=task.title)
-    db.add(new_task)
-    db.commit()
-    db.refresh(new_task)
-    return new_task
 
+    db = SessionLocal()
+
+    try:
+
+        new_task = models.Task(
+            title=task.title
+        )
+
+        db.add(new_task)
+
+        db.commit()
+
+        db.refresh(new_task)
+
+        return new_task
+
+    finally:
+        db.close()
 
 @app.get("/tasks")
 def get_tasks():
+
     db = SessionLocal()
-    tasks = db.query(models.Task).all()
-    return tasks
+
+    try:
+        tasks = db.query(models.Task).all()
+        return tasks
+
+    finally:
+        db.close()
+
 
 @app.put("/tasks/{task_id}")
 def complete_task(task_id: int):
 
     db = SessionLocal()
 
-    task = db.query(models.Task).filter(
-        models.Task.id == task_id
-    ).first()
+    try:
 
-    task.completed = True
+        task = db.query(models.Task).filter(
+            models.Task.id == task_id
+        ).first()
 
-    db.commit()
+        task.completed = True
 
-    return {"message": "Task completed"}
+        db.commit()
+
+        return {"message": "Task completed"}
+
+    finally:
+        db.close()
+
 
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: int):
-    
+
     db = SessionLocal()
-    
-    task = db.query(models.Task).filter(
-        models.Task.id == task_id
-    ).first()
-    
-    db.delete(task)
-    
-    db.commit()
-    return {"message": "Task deleted"}
-    
+
+    try:
+
+        task = db.query(models.Task).filter(
+            models.Task.id == task_id
+        ).first()
+
+        db.delete(task)
+
+        db.commit()
+
+        return {"message": "Deleted"}
+
+    finally:
+        db.close()
